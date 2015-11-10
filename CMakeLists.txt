@@ -26,7 +26,6 @@ set(SOURCES
     src/generator.c
     src/gmath.c
     src/info.c
-    src/nmea.vcproj
     src/parse.c
     src/parser.c
     src/sentence.c
