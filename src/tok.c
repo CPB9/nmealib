@@ -11,6 +11,7 @@
 /*! \file tok.h */
 
 #include "nmea/tok.h"
+#include "nmea/strtod.h"
 
 #include <stdarg.h>
 #include <stdlib.h>
@@ -70,7 +71,7 @@ double nmea_atof(const char *str, int str_sz)
     {
         memcpy(&buff[0], str, str_sz);
         buff[str_sz] = '\0';
-        res = strtod(&buff[0], &tmp_ptr);
+        res = kml_strtod(&buff[0], &tmp_ptr);
     }
 
     return res;
