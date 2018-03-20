@@ -96,7 +96,7 @@ double nmea_distance(
 /**
  * \brief Calculate distance between two points
  * This function uses an algorithm for an oblate spheroid earth model.
- * The algorithm is described here: 
+ * The algorithm is described here:
  * http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
  * \return Distance in meters
  */
@@ -111,7 +111,7 @@ double nmea_distance_ellipsoid(
     double f, a, b, sqr_a, sqr_b;
     double L, phi1, phi2, U1, U2, sin_U1, sin_U2, cos_U1, cos_U2;
     double sigma, sin_sigma, cos_sigma, cos_2_sigmam, sqr_cos_2_sigmam, sqr_cos_alpha, lambda, sin_lambda, cos_lambda, delta_lambda;
-    int remaining_steps; 
+    int remaining_steps;
     double sqr_u, A, B, delta_sigma;
 
     /* Check input */
@@ -124,7 +124,7 @@ double nmea_distance_ellipsoid(
             *from_azimuth = 0;
         if ( to_azimuth != 0 )
             *to_azimuth = 0;
-        return 0;    
+        return 0;
     } /* Identical points */
 
     /* Earth geometry */
@@ -153,46 +153,45 @@ double nmea_distance_ellipsoid(
     sqr_cos_2_sigmam = cos_2_sigmam * cos_2_sigmam;
     sqr_cos_alpha = 0;
     lambda = L;
-    sin_lambda = sin(lambda);                            
-    cos_lambda = cos(lambda);                       
+    sin_lambda = sin(lambda);
+    cos_lambda = cos(lambda);
     delta_lambda = lambda;
-    remaining_steps = 20; 
+    remaining_steps = 20;
 
-    while ((delta_lambda > 1e-12) && (remaining_steps > 0)) 
+    while ((delta_lambda > 1e-12) && (remaining_steps > 0))
     { /* Iterate */
         /* Variables */
-        double tmp1, tmp2, tan_sigma, sin_alpha, cos_alpha, C, lambda_prev; 
+        double tmp1, tmp2, sin_alpha, cos_alpha, C, lambda_prev;
 
         /* Calculation */
         tmp1 = cos_U2 * sin_lambda;
-        tmp2 = cos_U1 * sin_U2 - sin_U1 * cos_U2 * cos_lambda;  
-        sin_sigma = sqrt(tmp1 * tmp1 + tmp2 * tmp2);                
-        cos_sigma = sin_U1 * sin_U2 + cos_U1 * cos_U2 * cos_lambda;   
-        tan_sigma = sin_sigma / cos_sigma;                  
-        sin_alpha = cos_U1 * cos_U2 * sin_lambda / sin_sigma;  
-        cos_alpha = cos(asin(sin_alpha));                 
-        sqr_cos_alpha = cos_alpha * cos_alpha;                     
+        tmp2 = cos_U1 * sin_U2 - sin_U1 * cos_U2 * cos_lambda;
+        sin_sigma = sqrt(tmp1 * tmp1 + tmp2 * tmp2);
+        cos_sigma = sin_U1 * sin_U2 + cos_U1 * cos_U2 * cos_lambda;
+        sin_alpha = cos_U1 * cos_U2 * sin_lambda / sin_sigma;
+        cos_alpha = cos(asin(sin_alpha));
+        sqr_cos_alpha = cos_alpha * cos_alpha;
         cos_2_sigmam = cos_sigma - 2 * sin_U1 * sin_U2 / sqr_cos_alpha;
-        sqr_cos_2_sigmam = cos_2_sigmam * cos_2_sigmam; 
+        sqr_cos_2_sigmam = cos_2_sigmam * cos_2_sigmam;
         C = f / 16 * sqr_cos_alpha * (4 + f * (4 - 3 * sqr_cos_alpha));
-        lambda_prev = lambda; 
-        sigma = asin(sin_sigma); 
-        lambda = L + 
+        lambda_prev = lambda;
+        sigma = asin(sin_sigma);
+        lambda = L +
             (1 - C) * f * sin_alpha
-            * (sigma + C * sin_sigma * (cos_2_sigmam + C * cos_sigma * (-1 + 2 * sqr_cos_2_sigmam)));                                                
-        delta_lambda = lambda_prev - lambda; 
-        if ( delta_lambda < 0 ) delta_lambda = -delta_lambda; 
+            * (sigma + C * sin_sigma * (cos_2_sigmam + C * cos_sigma * (-1 + 2 * sqr_cos_2_sigmam)));
+        delta_lambda = lambda_prev - lambda;
+        if ( delta_lambda < 0 ) delta_lambda = -delta_lambda;
         sin_lambda = sin(lambda);
         cos_lambda = cos(lambda);
-        remaining_steps--; 
+        remaining_steps--;
     }  /* Iterate */
 
     /* More calculation  */
-    sqr_u = sqr_cos_alpha * (sqr_a - sqr_b) / sqr_b; 
+    sqr_u = sqr_cos_alpha * (sqr_a - sqr_b) / sqr_b;
     A = 1 + sqr_u / 16384 * (4096 + sqr_u * (-768 + sqr_u * (320 - 175 * sqr_u)));
     B = sqr_u / 1024 * (256 + sqr_u * (-128 + sqr_u * (74 - 47 * sqr_u)));
-    delta_sigma = B * sin_sigma * ( 
-        cos_2_sigmam + B / 4 * ( 
+    delta_sigma = B * sin_sigma * (
+        cos_2_sigmam + B / 4 * (
         cos_sigma * (-1 + 2 * sqr_cos_2_sigmam) -
         B / 6 * cos_2_sigmam * (-3 + 4 * sin_sigma * sin_sigma) * (-3 + 4 * sqr_cos_2_sigmam)
         ));
@@ -245,7 +244,7 @@ int nmea_move_horz(
 /**
  * \brief Horizontal move of point position
  * This function uses an algorithm for an oblate spheroid earth model.
- * The algorithm is described here: 
+ * The algorithm is described here:
  * http://www.ngs.noaa.gov/PUBS_LIB/inverse.pdf
  */
 int nmea_move_horz_ellipsoid(
@@ -259,15 +258,15 @@ int nmea_move_horz_ellipsoid(
     /* Variables */
     double f, a, b, sqr_a, sqr_b;
     double phi1, tan_U1, sin_U1, cos_U1, s, alpha1, sin_alpha1, cos_alpha1;
-    double tan_sigma1, sigma1, sin_alpha, cos_alpha, sqr_cos_alpha, sqr_u, A, B;
+    double sigma1, sin_alpha, sqr_cos_alpha, sqr_u, A, B;
     double sigma_initial, sigma, sigma_prev, sin_sigma, cos_sigma, cos_2_sigmam, sqr_cos_2_sigmam, delta_sigma;
     int remaining_steps;
     double tmp1, phi2, lambda, C, L;
-    
+
     /* Check input */
     NMEA_ASSERT(start_pos != 0);
     NMEA_ASSERT(end_pos != 0);
-    
+
     if (fabs(distance) < 1e-12)
     { /* No move */
         *end_pos = *start_pos;
@@ -281,7 +280,7 @@ int nmea_move_horz_ellipsoid(
     b = (1 - f) * a;
     sqr_a = a * a;
     sqr_b = b * b;
-    
+
     /* Calculation */
     phi1 = start_pos->lat;
     tan_U1 = (1 - f) * tan(phi1);
@@ -291,15 +290,13 @@ int nmea_move_horz_ellipsoid(
     alpha1 = azimuth;
     sin_alpha1 = sin(alpha1);
     cos_alpha1 = cos(alpha1);
-    tan_sigma1 = tan_U1 / cos_alpha1;
     sigma1 = atan2(tan_U1, cos_alpha1);
     sin_alpha = cos_U1 * sin_alpha1;
     sqr_cos_alpha = 1 - sin_alpha * sin_alpha;
-    cos_alpha = sqrt(sqr_cos_alpha);
-    sqr_u = sqr_cos_alpha * (sqr_a - sqr_b) / sqr_b; 
+    sqr_u = sqr_cos_alpha * (sqr_a - sqr_b) / sqr_b;
     A = 1 + sqr_u / 16384 * (4096 + sqr_u * (-768 + sqr_u * (320 - 175 * sqr_u)));
     B = sqr_u / 1024 * (256 + sqr_u * (-128 + sqr_u * (74 - 47 * sqr_u)));
-    
+
     /* Initialize iteration */
     sigma_initial = s / (b * A);
     sigma = sigma_initial;
@@ -317,16 +314,16 @@ int nmea_move_horz_ellipsoid(
         sqr_cos_2_sigmam = cos_2_sigmam * cos_2_sigmam;
         sin_sigma = sin(sigma);
         cos_sigma = cos(sigma);
-        delta_sigma = B * sin_sigma * ( 
-             cos_2_sigmam + B / 4 * ( 
-             cos_sigma * (-1 + 2 * sqr_cos_2_sigmam) - 
+        delta_sigma = B * sin_sigma * (
+             cos_2_sigmam + B / 4 * (
+             cos_sigma * (-1 + 2 * sqr_cos_2_sigmam) -
              B / 6 * cos_2_sigmam * (-3 + 4 * sin_sigma * sin_sigma) * (-3 + 4 * sqr_cos_2_sigmam)
              ));
         sigma_prev = sigma;
         sigma = sigma_initial + delta_sigma;
         remaining_steps --;
     } /* Iterate */
-    
+
     /* Calculate result */
     tmp1 = (sin_U1 * sin_sigma - cos_U1 * cos_sigma * cos_alpha1);
     phi2 = atan2(
@@ -343,7 +340,7 @@ int nmea_move_horz_ellipsoid(
         sigma + C * sin_sigma *
         (cos_2_sigmam + C * cos_sigma * (-1 + 2 * sqr_cos_2_sigmam))
         );
-    
+
     /* Result */
     end_pos->lon = start_pos->lon + L;
     end_pos->lat = phi2;

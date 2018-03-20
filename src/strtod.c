@@ -1,4 +1,4 @@
-/* 
+/*
  * strtod.c --
  *
  *	Source code for the "strtod" library procedure.
@@ -70,8 +70,8 @@ static double powersOf10[] = {	/* Table giving binary powers of 10.  Entry */
  */
 
 double
-kml_strtod(const char *string, char **endPtr)
-                /* 
+nmea_strtod(const char *string, char **endPtr)
+                /*
                  * string
                  *
                  * A decimal ASCII floating-point number,
@@ -153,7 +153,7 @@ kml_strtod(const char *string, char **endPtr)
      * If the mantissa has more than 18 digits, ignore the extras, since
      * they can't affect the value anyway.
      */
-    
+
     pExp  = p;
     p -= mantSize;
     if (decPt < 0) {
@@ -231,7 +231,7 @@ kml_strtod(const char *string, char **endPtr)
      * many powers of 2 of 10. Then combine the exponent with the
      * fraction.
      */
-    
+
     if (exp < 0) {
 	expSign = TRUE;
 	exp = -exp;

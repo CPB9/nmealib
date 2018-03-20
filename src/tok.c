@@ -71,7 +71,7 @@ double nmea_atof(const char *str, int str_sz)
     {
         memcpy(&buff[0], str, str_sz);
         buff[str_sz] = '\0';
-        res = kml_strtod(&buff[0], &tmp_ptr);
+        res = nmea_strtod(&buff[0], &tmp_ptr);
     }
 
     return res;
@@ -130,7 +130,7 @@ int nmea_scanf(const char *buff, int buff_sz, const char *format, ...)
     void *parg_target;
 
     va_start(arg_ptr, format);
-    
+
     for(; *format && buff < end_buf; ++format)
     {
         switch(tok_type)

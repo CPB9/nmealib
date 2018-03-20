@@ -4,7 +4,7 @@
 #ifdef  __cplusplus
 extern "C" {
 #endif
-    double kml_strtod(const char* str, char** endPtr);
+double nmea_strtod(const char* str, char** endPtr);
 
 #ifdef  __cplusplus
 }

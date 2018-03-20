@@ -34,7 +34,7 @@ set(SOURCES
     src/sentence.c
     src/time.c
     src/tok.c
-    src/strtod.cc
+    src/strtod.c
 )
 
 add_library(nmealib
